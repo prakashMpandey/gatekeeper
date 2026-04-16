@@ -15,6 +15,15 @@ Gatekeeper is a secure, scalable, and decentralized microservices architecture d
 
 4. **Redis Cache / Message Broker (`redis`)**: Stores refresh tokens securely using TTLs and acts as a broker for BullMQ to handle async audit logging.
 
+### 💻 Tech Stack
+- **Backend Framework:** Node.js, Express.js
+- **Database:** MongoDB (with Mongoose)
+- **Caching & Message Broker:** Redis
+- **Message Queue:** BullMQ (for asynchronous audit logging)
+- **Authentication:** JSON Web Tokens (JWT) with asymmetric RS256 keys
+- **Security:** Bcrypt.js (password hashing)
+- **Infrastructure & Orchestration:** Docker, Docker Compose
+
 ---
 
 ## 🔐 Auth & RBAC Flow

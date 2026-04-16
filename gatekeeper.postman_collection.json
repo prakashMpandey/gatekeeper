@@ -1,0 +1,617 @@
+{
+  "info": {
+    "_postman_id": "73d7d64d-bf00-4a08-8197-9a64a58b9301",
+    "name": "gatekeeper",
+    "description": "**ASSIGNMENT DOCUMENTATION (Centralized Authentication & RBAC for Microservices**)\n\n**Gatekeeper** is a centralized Authentication and Authorization (AuthN/AuthZ) microservice designed to act as the security backbone of your application ecosystem. It implements a robust **Role-Based Access Control (RBAC)** architecture to ensure that every request is not only authenticated but also authorized based on granular permissions.\n\n### Key Features\n\n- **Dual-Token Security:** Utilizes **JWT (JSON Web Tokens)** with a short-lived `accessToken` for security and a long-lived `refreshToken` for seamless user sessions.\n    \n- **Granular RBAC:** Move beyond simple \"Admin\" or \"User\" labels. Gatekeeper allows you to define specific **Permissions** (e.g., `orders:read`, `users:delete`) and group them into **Roles**.\n    \n- **Audit Logging:** Every sensitive action (GET, POST, DELETE) is intercepted and logged with a timestamp, user ID, and status code, providing a full trail for security compliance.\n    \n- **Secure Cookie Handling:** Tokens are delivered via `httpOnly` and `Secure` cookies to mitigate XSS (Cross-Site Scripting) and CSRF (Cross-Site Request Forgery) risks.\n    \n- **Dynamic Role Assignment:** Administrators can promote or demote users in real-time without requiring a system reboot or manual database intervention.\n    \n\n### 🏗️ Technical Architecture\n\n1. **Identification:** The user logs in and receives a set of tokens from the auth service\n    \n2. **Verification:** For every protected request, middleware verifies the signature of the Bearer token.\n    \n3. **Authorization:** it checks if the user's assigned role contains the specific permission required for that route.\n    \n4. **Logging:** The interaction is recorded in the Audit Log database for monitoring.\n    \n\n### 🛠️ Tech Stack\n\n- **Runtime:** Node.js / Express.js\n    \n- **Database:** MongoDB (for storing Users, Roles, and Logs)\n    \n- **Auth:** JWT (jsonwebtoken)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53969217",
+    "_collection_link": "https://go.postman.co/collection/53969217-73d7d64d-bf00-4a08-8197-9a64a58b9301?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth Service",
+      "item": [
+        {
+          "name": "RBAC",
+          "item": [
+            {
+              "name": "create permission",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"resource\": \"users\",\n    \"action\": \"read\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/permissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "permissions"
+                  ]
+                },
+                "description": "Logs in the user and returns Access and Refresh tokens."
+              },
+              "response": []
+            },
+            {
+              "name": "get all permissions",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@example.com\",\n    \"username\":\"test3\",\n    \"password\": \"password123\"\n    \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/permissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "permissions"
+                  ]
+                },
+                "description": "Logs in the user and returns Access and Refresh tokens."
+              },
+              "response": []
+            },
+            {
+              "name": "add permission to role",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@example.com\",\n    \"username\":\"test3\",\n    \"password\": \"password123\"\n    \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Logs in the user and returns Access and Refresh tokens."
+              },
+              "response": []
+            },
+            {
+              "name": "add role to user",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\"roleId\":\"69df159d5fad50ca58e3a08c\"\n    \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/roles/assign/:userId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "roles",
+                    "assign",
+                    ":userId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "69df159d5fad50ca58e3a08f"
+                    }
+                  ]
+                },
+                "description": "Logs in the user and returns Access and Refresh tokens."
+              },
+              "response": []
+            },
+            {
+              "name": "get all roles",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@example.com\",\n    \"username\":\"test3\",\n    \"password\": \"password123\"\n    \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/roles",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "roles"
+                  ]
+                },
+                "description": "Logs in the user and returns Access and Refresh tokens."
+              },
+              "response": []
+            },
+            {
+              "name": "remove role from user",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\"roleId\":\"69df159d5fad50ca58e3a08c\"\n    \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/roles/remove/:userId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "roles",
+                    "remove",
+                    ":userId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "69df159d5fad50ca58e3a08f"
+                    }
+                  ]
+                },
+                "description": "Logs in the user and returns Access and Refresh tokens."
+              },
+              "response": []
+            }
+          ],
+          "description": "## RBAC & Permissions\n\nThese endpoints handle the configuration of roles and granular access control (RBAC).\n\n### 1\\. Create Permission\n\nDefines a new capability within the system for a specific resource.\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/permissions`\n    \n- JSON{ \"resource\": \"users\", \"action\": \"read\"}\n    \n- **Description:** Creates a permission string (e.g., `users:read`) that can later be attached to roles.\n    \n\n### 2\\. Get All Permissions\n\nRetrieves every permission currently defined in the database.\n\n- **Method:** `GET`\n    \n- **Endpoint:** `/auth/permissions`\n    \n- **Description:** Useful for populating dropdowns or lists in an Admin Dashboard.\n    \n\n### 3\\. Get All Roles\n\nLists all roles available in the system.\n\n- **Method:** `GET`\n    \n- **Endpoint:** `/auth/roles`\n    \n- **Description:** Fetches roles like `Admin`, `Editor`, or `Viewer` along with their associated metadata.\n    \n\n### 4\\. Assign Role to User\n\nLinks a specific role to a user account.\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/roles/assign/:userId`\n    \n- **Path Variable:** `userId` (The Unique ID of the target user)\n    \n- JSON{ \"roleId\": \"69df159d5fad50ca58e3a08c\"}\n    \n\n### 5\\. Remove Role from User\n\nRevokes a previously assigned role from a user.\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/roles/remove/:userId`\n    \n- **Path Variable:** `userId`\n    \n- JSON{ \"roleId\": \"69df159d5fad50ca58e3a08c\"}"
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in the user and returns Access and Refresh tokens in the cookie as well as body"
+          },
+          "response": []
+        },
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"username\":\"test3\",\n    \"password\": \"password123\"\n    \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in the user and returns Access and Refresh tokens."
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logs in the user and returns Access and Refresh tokens."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get current logged in user",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ],
+      "description": "### 1.Register User\n\nCreates a new user account in the system.\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/login` _(Note: Review your collection path; typically this is_ `_/auth/register_`_)_.\n    \n- JSON{ \"email\": \"[admin@example.com](https://mailto:admin@example.com)\", \"username\": \"test3\", \"password\": \"password123\"}\n    \n\n### 2\\. User Login\n\nAuthenticates credentials and issues tokens.\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/login`\n    \n- **Description:** Returns **Access** and **Refresh** tokens in both the response body and secure cookies.\n    \n- JSON{ \"email\": \"[test@gmail.com](https://mailto:test@gmail.com)\", \"password\": \"password123\"}\n    \n\n### 3\\. Token Refresh\n\nGenerates a new access token using a valid refresh token by default it uses refresh token cookie but refresh token can be sent in body.\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/refresh`\n    \n\n### 4\\. User Logout\n\nTerminates the user session by clearing the security tokens.\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/logout`\n    \n- **Authentication:** Required (Bearer Token)\n    \n- **Description:** This route invalidates the user's current session. It typically removes the Refresh Token from the database/whitelist and clears the `accessToken` and `refreshToken` cookies from the browser.\n    \n\nEndFragment"
+    },
+    {
+      "name": "Order Service (Protected)",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Requires 'orders:read' permission."
+          },
+          "response": []
+        },
+        {
+          "name": "delete order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Requires 'orders:read' permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"total\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Requires 'orders:write' permission."
+          },
+          "response": []
+        }
+      ],
+      "description": "Business logic endpoints protected by Bearer authentication.\n\n### 1\\. Get All Orders\n\n- **Method:** `GET`\n    \n- **Endpoint:** `/orders`\n    \n- **Permission Required:** `orders:read`\n    \n\n### 2\\. Create Order\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/orders`\n    \n- **Permission Required:** `orders:write`\n    \n- JSON{ \"total\": 5000 }\n    \n\n### 3\\. Delete Order\n\n- **Method:** `DELETE`\n    \n- **Endpoint:** `/orders`\n    \n- **Permission Required:** `orders:delete`"
+    },
+    {
+      "name": "audit logs and users data",
+      "item": [
+        {
+          "name": "Toggle User Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n   \"userId\":\"69df159d5fad50ca58e3a08f\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logs"
+              ]
+            },
+            "description": "requires logs:read permission"
+          },
+          "response": [
+            {
+              "name": "get logs",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/logs",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "logs"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "RateLimit",
+                  "value": "\"100-in-15min\"; r=98; t=890"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "\"100-in-15min\"; q=100; w=900; pk=:YmIwY2Q1MTM2YWU1:"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "3364"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"d24-Y6fAjM1crgseKHBoPxbWWH/PqCU\""
+                },
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 15:56:49 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "close"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"data\": [\n        {\n            \"_id\": \"69df4c37840db4ed64425013\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"GET\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T08:28:39.732Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69df4ca1840db4ed64425014\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"POST\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T08:30:25.116Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69df4d870559894d11ab9911\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"POST\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T08:34:15.243Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69df4ec50559894d11ab9912\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"GET\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T08:39:33.354Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69df4edd0559894d11ab9913\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"GET\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T08:39:57.616Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69df50200559894d11ab9914\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"POST\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T08:45:20.141Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69df50280559894d11ab9915\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"GET\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T08:45:28.850Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69df50380559894d11ab9916\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"DELETE\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/69df3b2ebdfcdf922dad7520\",\n            \"statusCode\": 404,\n            \"timestamp\": \"2026-04-15T08:45:44.811Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfa4386bec40d6db255d0a\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"GET\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T14:44:08.909Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfaa9456f87a832c8c3922\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"GET\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T15:11:16.864Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfaa9d56f87a832c8c3923\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"POST\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T15:11:25.456Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfaac356f87a832c8c3924\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"POST\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T15:12:03.862Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfaadb56f87a832c8c3925\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"POST\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T15:12:27.467Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfac5756f87a832c8c3926\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"GET\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T15:18:47.680Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfac6b56f87a832c8c3927\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"DELETE\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/69df3b2ebdfcdf922dad7523\",\n            \"statusCode\": 200,\n            \"timestamp\": \"2026-04-15T15:19:07.848Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfac7956f87a832c8c3928\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"DELETE\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/69df3b2ebdfcdf922dad7523\",\n            \"statusCode\": 404,\n            \"timestamp\": \"2026-04-15T15:19:21.228Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69dfac7a56f87a832c8c3929\",\n            \"userId\": \"69df159d5fad50ca58e3a08f\",\n            \"action\": \"DELETE\",\n            \"resource\": \"orders\",\n            \"path\": \"/orders/69df3b2ebdfcdf922dad7523\",\n            \"statusCode\": 404,\n            \"timestamp\": \"2026-04-15T15:19:22.646Z\",\n            \"__v\": 0\n        }\n    ],\n    \"message\": \"audit logs fetched successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "get all usrs",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\"roleId\":\"69df159d5fad50ca58e3a08c\"\n    \n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/users/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "users",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "### Toggle User Status\n\n- **Method:** `POST`\n    \n- **Endpoint:** `/auth/status`\n    \n- **Description:** Enable or disable a user account.\n    \n- **Body:** `{ \"userId\": \"69df15...\" }`\n    \n\n### Audit Logs\n\nProvides a historical record of all API interactions for security auditing.\n\n- **Method:** `GET`\n    \n- **Endpoint:** `/auth/logs`\n    \n- **Permission Required:** `logs:read`\n    \n\n### GET ALL USERS\n\nProvides a historical record of all API interactions for security auditing.\n\n- **Method:** `GET`\n    \n- **Endpoint:** `/auth/users`\n    \n- **Permission Required:** `users:read`"
+    }
+  ],
+  "auth": {
+    "type": "bearer"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    }
+  ]
+}
