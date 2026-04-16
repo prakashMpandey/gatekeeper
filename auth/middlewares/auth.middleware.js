@@ -1,24 +1,24 @@
 import jwt from "jsonwebtoken";
 const privateKey = process.env.JWT_PRIVATE_KEY.replace(/\\n/g, '\n');
-import {redisClient} from "../db/redis.js"
+import {sharedRedisClient} from "../db/redis.js"
 
 const verifyJWT=async(req,res,next)=>{
  try {
        const accessToken=req.cookies?.accessToken;
 
-
        if(!accessToken)
        {
            return res.status(401).json({"message":"invalid access"})
        }
+       const isTokenBlackListed=await sharedRedisClient.get(accessToken);
 
-       if(redisClient.get(accessToken)==='blacklisted')
+       if(isTokenBlackListed)
        {
         return res.status(401).json({"message":"unauthorized"})
        }
 
        const decodedToken=jwt.verify(accessToken,privateKey,{algorithm:'RS256'});
-        console.log(decodedToken)
+        
        if(!decodedToken)
        {
            return res.status(401).json({"message":"unauthorized"})
