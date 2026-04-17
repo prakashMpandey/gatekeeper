@@ -4,6 +4,8 @@ const publicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
 
 const verifyJWT = async (req, res, next) => {
   try {
+
+    
     const accessToken =
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "").trim();
@@ -11,11 +13,15 @@ const verifyJWT = async (req, res, next) => {
     if (!accessToken) {
       return res.status(401).json({ message: "unauthorized" });
     }
+
+    // check if the token is blacklisted
     const isBlacked = await sharedRedisClient.get(accessToken);
 
+    //  check if the token is blacklisted
     if (isBlacked) {
       return res.status(401).json({ message: "unauthorized" });
     }
+    // decode the token
     const decodedToken = jwt.verify(accessToken, publicKey, {
       algorithm: "RS256",
     });
@@ -24,6 +30,7 @@ const verifyJWT = async (req, res, next) => {
       return res.status(401).json({ message: "user not authenticated" });
     }
 
+    // add the user in the request user
     req.user = {
       userId: decodedToken?.userId,
       isActive: decodedToken?.isActive,

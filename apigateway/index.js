@@ -16,6 +16,8 @@ app.use(cors({
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 
+
+// adding limit to the authentication service
 const AuthLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000, 
 	limit: 20, 
@@ -23,6 +25,8 @@ const AuthLimiter = rateLimit({
 	legacyHeaders: false,
 	ipv6Subnet: 56, 
 })
+
+// rate limiting properties for the order service
 const orderLimiter = rateLimit({  // 50 request per minute
 	windowMs: 60 * 1000, 
 	limit: 10, 
@@ -32,23 +36,30 @@ const orderLimiter = rateLimit({  // 50 request per minute
 
 })
 
+// auth proxy
 const authProxy=createProxyMiddleware({
     target:`${process.env.AUTH_SERVICE_URL}/auth`,
     changeOrigin:true,
     xfwd: true,
     logger:console,
 })
+
+// order proxy
 const orderProxy=createProxyMiddleware({
     target:`${process.env.ORDER_SERVICE_URL}`,
     changeOrigin:true,
     xfwd: true,
     logger:console
 })
-
+// check if the api healthy
 app.get("/",(req,res)=>{
    return res.status(200).json({"message":"api is healthy"})
 })
+
+/// send the authentication routes to auth service
 app.use("/auth",AuthLimiter,authProxy)
+
+// send the order routes to order service
 app.use("/orders",orderLimiter,orderProxy)
 
 app.listen(process.env.API_GATEWAY_PORT,()=>{

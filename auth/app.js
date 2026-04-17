@@ -32,9 +32,14 @@ app.use("/auth/permissions",permissionRouter);
 
 
 
+// start the audit worker
 AuditWorker();
 console.log("audit server started")
+
+// connect db 
 connectDB().then(async()=>{
+
+    // load the roles in the cache
     await loadRolesIntoCache();
     app.listen(3000,()=>{
         console.log("server is running on port 3000")

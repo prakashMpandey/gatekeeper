@@ -3,7 +3,6 @@ import { accessTokenGenerator,refreshTokenGenerator } from "../utils/tokenGenera
 import { SuccessResponse,ErrorResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { redisClient as redis,sharedRedisClient  } from "../db/redis.js";
-import { access, readFileSync } from 'node:fs';
 
 
 
@@ -15,6 +14,8 @@ const register = async (req, res) => {
     if (!email || !username || !password) {
       return res.status(400).json({ message: "all  fields are required" });
     }
+
+    // checks if the user already exists
     const existingUser = await User.findOne({
       $or: [{ username: username }, { email: email }],
     });
@@ -23,6 +24,8 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "user already exists" });
     }
 
+
+    // create new user 
     const newUser = await User.create({
       email: email,
       username: username,
@@ -49,23 +52,31 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "all fields are required" });
     }
 
+
+    // finds the user 
     const user = await User.findOne({ email: email });
 
     if (!user) {
       return res.status(404).json({ message: "sorry user does not exists" });
     }
 
+    // if the use is not active return back as disabled user cannot receive tokens
     if (!user.isActive){
       return res.status(401).json({message:"user is not active"})
     }
     
+    // checks if the password is correct
     const isPasswordCorrect = await user.verifyPassword(password)
 
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: "invalid credentials" });
     }
 
+
+    // create new access token
     const accessToken = await accessTokenGenerator(user._id);
+
+    //create new refresh token
     const refreshToken = await refreshTokenGenerator(user._id);
 
 
@@ -74,10 +85,9 @@ const login = async (req, res) => {
       throw new Error("refresh token or access token not generated");
     }
 
+    // save the refresh token in the redis cache
     await redis.SETEX( `refresh:${user._id}`,604800,refreshToken)
     
-
-    console.log(accessToken,refreshToken)
     return res
       .status(200)
       .cookie("accessToken", accessToken, {
@@ -99,7 +109,8 @@ const login = async (req, res) => {
 };
 const refresh=async(req,res)=>{
 try {
-    console.log("hello")
+  
+    // take the refresh token from cookie or request body
     const userToken=req?.cookies?.refreshToken || req.body?.refreshToken
 
     if (!userToken){
@@ -115,29 +126,34 @@ try {
   
     const userId=decodedToken.userId;
 
+
     const savedToken=await redis.get(`refresh:${userId}`)
   
+    // checks if the token saved in redis and sent by user matches or not
     if (userToken!==savedToken)
     {
       return res.status(400).json({"message":"please log in again"})
     }
   
   
+    // create new access token
     const accessToken=await accessTokenGenerator(userId);
+
+    // create new refresh token
     const refreshToken=await refreshTokenGenerator(userId);
 
 
     if(!accessToken || !refreshToken)
     {
-      return res.status(500).json({"message":"access token or refresh toekn not genrated"})
+      return res.status(500).json({"message":"access token or refresh toekn not generated"})
     }
     const options= {
           secure: true,
           httpOnly: true,
           maxAge: 24*60*60*1000,
         }
-        console.log(userId);
-
+       
+        // set the refresh token in the dedicated redis server
         await redis.SETEX( `refresh:${userId}`,604800,refreshToken)  // 7 days
         
     return res
@@ -147,13 +163,11 @@ try {
             .json({"message":"token generated","accessToken":accessToken})
             
 } catch (error) {
-  console.log(error)
   return res.status(500).json({"message":"internal server error"})
 }
 }
 const logout = async (req, res) => {
   const user = req.user;
-  console.log(user,req.cookies);
   const accessToken = req.cookies?.accessToken;
   if (!user || !accessToken) {
     throw new Error("user not logged in");
@@ -168,12 +182,13 @@ const logout = async (req, res) => {
       decodedToken?.id,
       { refreshToken: null }
     );
-
+    // if the user access token is not expired 
     await sharedRedisClient.set(accessToken, "blackedout", {
       expiration: { type: "EX", value: leftOutTime },
     });
   }
 
+  // delete the existing refresh token
   await redis.del(`refresh:{decodedToken.userId}`);
 
   return res
@@ -184,14 +199,15 @@ const logout = async (req, res) => {
 };
 const getCurrentUser=async(req,res)=>{
 
+  // return the current logged in user
   const user=await User.findById(req.user.userId,'-password ')
-
   return res.status(200).json({"data":user,"message":"user fetched successfully"});
 }
 const toggleUserStatus=async(req,res)=>{
 try {
     const {userId}=req.body;
   
+    // fetch the user from db
     const user=await User.findByIdAndUpdate(userId).select("-password -v");
   
     if (!user)
@@ -199,7 +215,9 @@ try {
       return res.status(404).json({"message":"user does not exists"}) 
     }
   
+    // change the active status of the user 
     user.isActive=!user.isActive;
+
     await user.save();
   
     return res.status(200).json({"message":"user status changed"})
@@ -207,11 +225,10 @@ try {
   return res.status(500).json({"message":"internal server error"})
 }
 }
-
 const getUsers=async(req,res)=>{
   const users=await User.find({});
 
   return res.status(200).json({"message":"users fetched successfully","data":users})
 }
 
-export {register,login,refresh,logout,getCurrentUser,toggleUserStatus}
+export {register,login,refresh,logout,getCurrentUser,toggleUserStatus,getUsers}

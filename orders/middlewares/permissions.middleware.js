@@ -10,7 +10,10 @@ const authorize = (resource,action) => {
         return res.status(401).json({"message":"unauthorized"});
        }
        
+       // check the roles 
        for (const el of req.user.role) {
+
+        // if the role has the req permissions
            const hasAccess = await sharedRedisClient.sIsMember(`role:perms:${el}`, reqPermisson);
            if (hasAccess) return next();
        }

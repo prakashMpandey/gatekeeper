@@ -18,9 +18,9 @@ app.use(cookieParser())
 
 app
 .route("/")
-.all(verifyJWT)
+.all(verifyJWT)  //v check the authentication
 .get(authorize("orders","read"),auditLogger("orders"),getAllOrders)
-.post(authorize("orders","write"),authorize("orders","delete"),auditLogger("orders"),createOrder)
+.post(authorize("orders","write"),authorize("orders","delete"),auditLogger("orders"),createOrder)  // add the logs
 
 
 app.delete("/:orderId",verifyJWT,authorize("orders","delete"),auditLogger("orders"),deleteOrder)

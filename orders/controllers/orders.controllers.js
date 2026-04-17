@@ -1,5 +1,8 @@
 import Order from "../models/orders.models.js";
 
+
+
+// the owner can create the order if he has "orders:write" permissio
 const createOrder=async(req,res)=>{
    try {
      const {total}=req.body
@@ -10,6 +13,8 @@ const createOrder=async(req,res)=>{
    }
 
 };
+
+// the owner can delete the order if he has "orders:delete" permission
 const deleteOrder=async(req,res)=>{
     try {
         const {orderId}=req.params;
@@ -42,6 +47,9 @@ const deleteOrder=async(req,res)=>{
         return res.status(500).json({"message":"internal server error"})
     }
 };
+
+
+// the owner can fetch the order if he has "orders:read" permission
 const getAllOrders=async(req,res)=>{
    try {
      const orders=await Order.find({ownerId:req.user.userId});
