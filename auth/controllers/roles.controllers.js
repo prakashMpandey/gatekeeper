@@ -64,6 +64,23 @@ const addRoleToUser = async (req, res) => {
   }
 };
 
+const getRole=async(req,res)=>{
+  const {roleId}=req.params;
+  if (!roleId)
+  {
+    return res.status(400).json({"message":"no role id found","status":400})
+  }
+
+  const role=await Role.findById(roleId);
+
+  if (!role)
+  {
+    return res.status(404).json({"message":"role does not exists"})
+  }
+
+  return res.status(200).json({"message":"role fetched successfully","data":role})
+}
+
 const getRoles = async (req, res) => {
   try {
     const roles = await Role.find({},{"__v":0}).populate("permissions","-__v");
@@ -141,4 +158,4 @@ const addPermissionToRole = async (req, res) => {
   }
 };
 
-export {createNewRole,addRoleToUser,addPermissionToRole,getRole,getRoles,removeRoleFromUser}
+export {createNewRole,getRole,addRoleToUser,addPermissionToRole,getRoles,removeRoleFromUser}

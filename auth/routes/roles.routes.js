@@ -5,8 +5,8 @@ import {
 	createNewRole,
 	addRoleToUser,
 	addPermissionToRole,
-	getRole,
 	getRoles,
+	getRole,
 	removeRoleFromUser
 } from "../controllers/roles.controllers.js";
 
