@@ -102,8 +102,6 @@ const addPermissionToRole = async (req, res) => {
     // Array check normalization
     const permsToAdd = Array.isArray(permissions) ? permissions : [permissions];
 
-    // 2. Atomic Update in MongoDB (Using $addToSet avoids duplicates automatically)
-    // Isse tujhe pehle role find karke filter karne ki zaroorat nahi padegi
     const updatedRole = await Role.findByIdAndUpdate(
       roleId,
       { $addToSet: { permissions: { $each: permsToAdd } } },

@@ -87,7 +87,7 @@ const seedDB = async () => {
             });
         }
         
-        // Loop isliye taaki pre-save hook (bcrypt) trigger ho
+        
         for (const u of fakeUsers) {
             await User.create(u);
         }

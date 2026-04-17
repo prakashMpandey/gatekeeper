@@ -4,7 +4,7 @@ import { ErrorResponse } from "./utils/ApiResponse.js"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
 import { redisClient } from "./db/redis.js"
-
+import { loadRolesIntoCache } from "./utils/cacheWarming.js"
 dotenv.config()
 const app=express()
 
@@ -34,7 +34,8 @@ app.use("/auth/permissions",permissionRouter);
 
 AuditWorker();
 console.log("audit server started")
-connectDB().then(()=>{
+connectDB().then(async()=>{
+    await loadRolesIntoCache();
     app.listen(3000,()=>{
         console.log("server is running on port 3000")
 })
